@@ -4,10 +4,12 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from telegram_bot import TelegramBot
+from mongodb import MongoDB
 
 
 chrome_driver = webdriver.Chrome()
 bot=TelegramBot()
+db = MongoDB()
 matrix_ruc=[
     "0992362316001"
 
@@ -32,6 +34,7 @@ for t in matrix_ruc:
     bot.send_tg_message(representante_legal_texto)
     representante_legal_ci_texto=(respuesta_contenedor.find_element(By.CSS_SELECTOR,'#sribody > sri-root > div > div.layout-main > div > div > sri-consulta-ruc-web-app > div > sri-ruta-ruc > div.row.ng-star-inserted > div:nth-child(1) > sri-mostrar-contribuyente > div:nth-child(1) > div:nth-child(4) > div > div.col-sm-8.ng-star-inserted > span > div > div.col-sm-12 > div > div.col-sm-12.ng-star-inserted > div > div:nth-child(4)')).text
     bot.send_tg_message(representante_legal_ci_texto)
+    db.insert_sri_consulta(text=ruc_texto,text1=razon_social_texto,text2=representante_legal_texto,text3=representante_legal_ci_texto)
     time.sleep(4)
 print("fin")
 chrome_driver.close()
