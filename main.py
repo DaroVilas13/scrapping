@@ -5,9 +5,16 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from telegram_bot import TelegramBot
 from mongodb import MongoDB
+from dotenv import load_dotenv
+import os
+from capmonster_python import RecaptchaV2Task
 
-
-chrome_driver = webdriver.Chrome()
+options = webdriver.ChromeOptions() 
+options.add_experimental_option('excludeSwitches', ['enable-logging'])
+chrome_driver = webdriver.Chrome(options=options)
+load_dotenv()
+API_KEY=os.getenv("API_KEY")
+WEBSITE_KEY=os.getenv("WEBSITE_KEY")
 bot=TelegramBot()
 db = MongoDB()
 matrix_ruc=[
@@ -15,14 +22,20 @@ matrix_ruc=[
 
 ]
 for t in matrix_ruc:
-    chrome_driver.get("https://srienlinea.sri.gob.ec/sri-en-linea/SriRucWeb/ConsultaRuc/Consultas/consultaRuc")
     print(chrome_driver.title)
+    chrome_driver.get("https://srienlinea.sri.gob.ec/sri-en-linea/SriRucWeb/ConsultaRuc/Consultas/consultaRuc")
     busca_ruc=chrome_driver.find_element(By.ID,"busquedaRucId")
     busca_ruc.send_keys(t)
     #busqueda por xpath
     #element_boton=chrome_driver.find_element(By.XPATH,'//*[@id="sribody"]/sri-root/div/div[2]/div/div/sri-consulta-ruc-web-app/div/sri-ruta-ruc/div[2]/div[1]/div[6]/div[2]/div/div[2]/div/button/span[1]')
     #busqueda por selector
     element_boton=chrome_driver.find_element(By.CSS_SELECTOR,'#sribody > sri-root > div > div.layout-main > div > div > sri-consulta-ruc-web-app > div > sri-ruta-ruc > div.row.ng-star-inserted > div.col-sm-12.ng-star-inserted > div:nth-child(7) > div.col-sm-6 > div > div:nth-child(2) > div > button > span.ui-button-text.ui-clickable')
+    #resuelve el capchat
+    capmonster = RecaptchaV2Task(API_KEY)
+    task_id = capmonster.create_task("https://srienlinea.sri.gob.ec/sri-en-linea/SriRucWeb/ConsultaRuc/Consultas/consultaRuc", WEBSITE_KEY, no_cache=True)
+    result = capmonster.join_task_result(task_id).get("gRecaptchaResponse")
+    chrome_driver.execute_script("document.getElementsByClassName('g-recaptcha-response')[0].innerHTML = " f"'{result}';")
+    chrome_driver.find_element(By.ID, "ngrecaptcha-0").click()
     element_boton.click()
     respuesta_contenedor=chrome_driver.find_element(By.CLASS_NAME,'container')
     #ruc_respuesta=(respuesta_contenedor.find_element(By.CSS_SELECTOR,'#sribody > sri-root > div > div.layout-main > div > div > sri-consulta-ruc-web-app > div > sri-ruta-ruc > div.row.ng-star-inserted > div:nth-child(1) > sri-mostrar-contribuyente > div:nth-child(1) > div.col-sm-4 > div:nth-child(2) > div > span')).text
