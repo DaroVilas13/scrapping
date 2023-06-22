@@ -1,41 +1,31 @@
-import time
 
+import time
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 
+
 chrome_driver = webdriver.Chrome()
-
-# bot = TelegramBot()
-# db = Mongo()
-
-
-chrome_driver.get("https://www.wikipedia.org/")
-print(chrome_driver.title)
-
-topics = [
-    "Vault 7",
-    "software espía Pegasus",
-    "CIBERGUERRA"
+matrix_ruc=[
+    "0990372055001",
+    "0992362316001"  
 ]
-
-for t in topics:
-    search_box = chrome_driver.find_element(By.ID, "searchInput")
-    search_box.send_keys(t)
-    search_button = chrome_driver.find_element(By.CSS_SELECTOR, '#search-form > fieldset > button > i')
-    search_button.click()
-
-    content = chrome_driver.find_element(By.ID, "mw-content-text")
-    print(content.text)
-
-    # enviar por telegram
-    # bot.send(content.text, chat_id)
-    # db.insert_wikipedia_text({
-    #   "topic": content.text
-    # }
-
-    time.sleep(2)
-    chrome_driver.get("https://www.wikipedia.org/")
-
+for t in matrix_ruc:
+    chrome_driver.get("https://srienlinea.sri.gob.ec/sri-en-linea/SriRucWeb/ConsultaRuc/Consultas/consultaRuc")
+    print(chrome_driver.title)
+    busca_ruc=chrome_driver.find_element(By.ID,"busquedaRucId")
+    busca_ruc.send_keys(t)
+    #busqueda por xpath
+    #element_boton=chrome_driver.find_element(By.XPATH,'//*[@id="sribody"]/sri-root/div/div[2]/div/div/sri-consulta-ruc-web-app/div/sri-ruta-ruc/div[2]/div[1]/div[6]/div[2]/div/div[2]/div/button/span[1]')
+    #busqueda por selector
+    element_boton=chrome_driver.find_element(By.CSS_SELECTOR,'#sribody > sri-root > div > div.layout-main > div > div > sri-consulta-ruc-web-app > div > sri-ruta-ruc > div.row.ng-star-inserted > div.col-sm-12.ng-star-inserted > div:nth-child(7) > div.col-sm-6 > div > div:nth-child(2) > div > button > span.ui-button-text.ui-clickable')
+    element_boton.click()
+    respuesta_contenedor=chrome_driver.find_element(By.CLASS_NAME,'container')
+    #ruc_respuesta=(respuesta_contenedor.find_element(By.CSS_SELECTOR,'#sribody > sri-root > div > div.layout-main > div > div > sri-consulta-ruc-web-app > div > sri-ruta-ruc > div.row.ng-star-inserted > div:nth-child(1) > sri-mostrar-contribuyente > div:nth-child(1) > div.col-sm-4 > div:nth-child(2) > div > span')).text
+    ruc_texto=(respuesta_contenedor.find_element(By.CSS_SELECTOR,'#sribody > sri-root > div > div.layout-main > div > div > sri-consulta-ruc-web-app > div > sri-ruta-ruc > div.row.ng-star-inserted > div:nth-child(1) > sri-mostrar-contribuyente > div:nth-child(1) > div.col-sm-4 > div:nth-child(2) > div > span')).text
+    razon_social_texto=(respuesta_contenedor.find_element(By.CSS_SELECTOR,'#sribody > sri-root > div > div.layout-main > div > div > sri-consulta-ruc-web-app > div > sri-ruta-ruc > div.row.ng-star-inserted > div:nth-child(1) > sri-mostrar-contribuyente > div:nth-child(1) > div.col-sm-8 > div:nth-child(2) > div > span')).text
+    representante_legal_texto=(respuesta_contenedor.find_element(By.CSS_SELECTOR,'#sribody > sri-root > div > div.layout-main > div > div > sri-consulta-ruc-web-app > div > sri-ruta-ruc > div.row.ng-star-inserted > div:nth-child(1) > sri-mostrar-contribuyente > div:nth-child(1) > div:nth-child(4) > div > div.col-sm-8.ng-star-inserted > span > div > div.col-sm-12 > div > div.col-sm-12.ng-star-inserted > div > div:nth-child(2)')).text
+    representante_legal_ci_texto=(respuesta_contenedor.find_element(By.CSS_SELECTOR,'#sribody > sri-root > div > div.layout-main > div > div > sri-consulta-ruc-web-app > div > sri-ruta-ruc > div.row.ng-star-inserted > div:nth-child(1) > sri-mostrar-contribuyente > div:nth-child(1) > div:nth-child(4) > div > div.col-sm-8.ng-star-inserted > span > div > div.col-sm-12 > div > div.col-sm-12.ng-star-inserted > div > div:nth-child(4)')).text
 
 print("fin")
 chrome_driver.close()
